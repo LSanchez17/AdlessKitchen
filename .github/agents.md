@@ -35,11 +35,13 @@ Guidelines for AI/code agents working in this monorepo.
 - Name files in snake_case format: `my_component.tsx`
 
 ## Server Standards (FastAPI)
-- Use Pydantic models for request/response schemas.
-- Keep route handlers thin; move logic to service modules.
-- Use dependency injection for shared resources.
-- Validate input and return explicit HTTP errors.
-- Keep async patterns consistent (`async def` where applicable).
+- Define **Pydantic models** for request/response schemas in `schemas/` and use them everywhere in routes and services. Keep these DTOs lean and explicit.
+- Maintain corresponding database models in `models/` (e.g. SQLAlchemy) and write conversion helpers or service-layer mappers. When fields are added/removed, update both schema and model together.
+- Keep route handlers thin; move business and validation logic into service modules. Services should accept/return schema objects, not raw dicts.
+- Use dependency injection for shared resources (DB session, current user, etc.) and annotate with `Depends`.
+- Always validate input with Pydantic, raise `HTTPException` with clear status codes and messages for errors.
+- Prefer `async def` for async DB calls or I/O; stay consistent across the codebase.
+- Write unit tests for schemas and model conversions to prevent drift and catch missing fields.
 
 ## API Contract Practices
 - Maintain clear DTO/schema boundaries between client and server.
