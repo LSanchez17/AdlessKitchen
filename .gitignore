@@ -27,3 +27,8 @@ dist-ssr
 # Python bytecode caches
 __pycache__/
 *.py[cod]
+
+# local env files
+server/.env
+client/.env
+TODO.md
