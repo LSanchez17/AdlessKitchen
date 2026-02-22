@@ -1,0 +1,51 @@
+# Creating migrations 
+
+This directory is managed by **Alembic** and contains your revision scripts.
+Whenever you change or add a SQLAlchemy model you must create a new migration
+and apply it to the database. The typical workflow is:
+
+1. **Define or update a model**
+   * Add/modify a class in `server/models/…` inheriting from `db.Base`.
+   * Make sure the module is imported somewhere when Alembic runs (see
+     `env.py` where we import `models.user`).
+
+2. **Generate a revision**
+   ```bash
+   # from the `server` folder, with the virtualenv activated
+   alembic revision --autogenerate -m "MY CHANGE SET HEREEE"
+   ```
+   * `--autogenerate` compares the current models against the database state
+     (tracked in `alembic_version`); it writes the diff into a new file under
+     `versions/`.
+   * Always open the generated file and inspect/adjust the SQL before
+     applying. Alembic guesses, but you are responsible for things like
+     indexes, comments, or non‑standard operations.
+
+3. **Apply the migration**
+   ```bash
+   alembic upgrade head
+   ```
+   or
+   ```bash
+   alembic upgrade <revision-id>
+   ```
+   * This executes the `upgrade()` function in the revision script on the
+     database defined by `DATABASE_URL` (pulled from `.env` via `env.py`).
+   * The `alembic_version` table is updated with the new revision id.
+
+4. **Repeat** whenever models change.
+
+### Additional tips
+
+* Use `alembic downgrade -1` to roll back the last applied migration during
+development.
+* If you need to run migrations programmatically (e.g. on app startup) you can
+import `alembic.command` from Python – see Alembic docs for details.
+* Commit the generated revision files (`db/migrations/versions/*.py`) along
+with your model changes; keep them in version control so every environment can
+replay the schema evolution.
+* For first-time setup, after generating the initial revision, run `alembic
+upgrade head` to create all tables.
+
+This README is intentionally simple; refer to the [Alembic documentation](https://alembic.sqlalchemy.org/) for advanced topics.
+

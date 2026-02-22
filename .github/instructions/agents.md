@@ -33,6 +33,7 @@ Guidelines for AI/code agents working in this monorepo.
 - Use shadcn/ui components and existing design tokens.
 - Keep UI components presentational; business logic in hooks/services.
 - Name files in snake_case format: `my_component.tsx`
+- DO NOT USE REACT.FC FFS
 
 ## Server Standards (FastAPI)
 - Define **Pydantic models** for request/response schemas in `schemas/` and use them everywhere in routes and services. Keep these DTOs lean and explicit.
