@@ -25,5 +25,14 @@ dist-ssr
 *.sw?
 
 # Python bytecode caches
-__pycache__/
-*.py[cod]
+server/*.py[cod]
+server/.pytest_cache/
+server/**/__pycache__/
+
+# local env files
+server/.env
+client/.env
+TODO.md
+
+#alembic churn
+server/db/migrations/__pycache__/
