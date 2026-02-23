@@ -16,7 +16,8 @@ class UserRead(UserBase):
     id: str
 
     class Config:
-        orm_mode = True   # allows reading from ORM object; FastAPI should serialize this
+        # allows reading from ORM object; FastAPI should serialize this
+        from_attributes = True   
 
 # For updating users, all fields are optional
 class UserUpdate(BaseModel):

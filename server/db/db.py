@@ -8,7 +8,7 @@ load_dotenv()
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql+psycopg://user:pass@localhost/dbname",
+    "URL",
 )
 
 engine = create_async_engine(DATABASE_URL, echo=True)
