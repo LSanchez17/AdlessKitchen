@@ -29,6 +29,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     # Some logic goes here
     return { "access_token": "email", "token_type": "bearer" }
 
-@router.post("/")
+@router.post("/signup")
 async def signup(new_user: UserCreate):
+    print(f"\n New user: {new_user}\n")
     return {"message": "This is a placeholder for the user controller."}

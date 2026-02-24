@@ -1,14 +1,16 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { useSignupMutation } from "@/api/endpoints/user/user_api"
 
 const Signup = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [signUp, { isLoading, isError }] = useSignupMutation()
 
     const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault()
-        console.log("signup", email, password)
+        signUp({ email, password })
     }
 
     return (
@@ -41,9 +43,14 @@ const Signup = () => {
                         className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
                     />
                 </div>
-                <Button type="submit" variant="secondary" className="w-full">
-                    Sign up
+                <Button type="submit" variant="secondary" className="w-full" disabled={isLoading}>
+                    {isLoading ? 'Signing up...' : 'Sign up'}
                 </Button>
+                {isError && (
+                    <p className="mt-4 text-red-400 text-center">
+                        Signup failed. Please check your information and try again.
+                    </p>
+                )}
             </form>
         </div>
     )

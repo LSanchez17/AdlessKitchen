@@ -1,11 +1,15 @@
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
-import type { AuthState } from '../global/types';
 import type { User } from './types';
+import type { RootState } from '@/store/store';
 
 
-const initialState: AuthState = {
-    user: null
+const initialState: User = {
+    token: undefined,
+    firstName: undefined,
+    lastName: undefined,
+    email: undefined,
+    id: undefined,
 };
 
 const userSlice = createSlice({
@@ -13,17 +17,26 @@ const userSlice = createSlice({
     initialState,
     reducers: {
         logout(state) {
-            state.user = null;
+            state.token = undefined;
+            state.firstName = undefined;
+            state.lastName = undefined;
+            state.email = undefined;
+            state.id = undefined;
         },
         setUser(state, action: PayloadAction<User | null>) {
-            state.user = action.payload;
+            const user = action.payload;
+            state.token = user?.token;
+            state.firstName = user?.firstName;
+            state.lastName = user?.lastName;
+            state.email = user?.email;
+            state.id = user?.id;
         },
     },
 });
 
 export const { logout, setUser } = userSlice.actions;
 
-export const selectCurrentUser = (state: { user: AuthState }) => state.user.user;
-export const selectIsUserLoggedIn = (state: { user: AuthState }) => !!state.user.user?.token;
+export const selectCurrentUser = (state: RootState) => state.users.id;
+export const selectIsUserLoggedIn = (state: RootState) => !!state.users.token;
 
 export default userSlice.reducer;
