@@ -1,8 +1,21 @@
-import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { fetchBaseQuery, type BaseQueryFn, type FetchArgs, type FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
 
-const baseQuery = fetchBaseQuery({
+const rawBaseQuery = fetchBaseQuery({
     baseUrl: import.meta.env.VITE_SERVER_URL || "http://localhost:8000/",
-    credentials: 'include'
+    credentials: 'include',
 });
+
+const baseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> =
+    async (args, api, extraOptions) => {
+        const result = await rawBaseQuery(args, api, extraOptions);
+
+        const redirect = result.meta?.response?.headers?.get('X-Redirect-To');
+        console.log('redirect??', result.meta?.response);
+        if (redirect) {
+            window.location.href = redirect;
+        }
+
+        return result;
+    };
 
 export default baseQuery;

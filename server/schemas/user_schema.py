@@ -19,6 +19,13 @@ class UserCreate(BaseModel):
 
     model_config = model_config
 
+# For logging in
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+    model_config = model_config
+
 # Include the id field for reading users
 class UserRead(UserBase):
     id: str

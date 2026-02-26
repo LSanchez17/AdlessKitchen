@@ -1,3 +1,5 @@
+from sqlalchemy import select
+
 class Transactions:
     @staticmethod
     async def save(_, db):
@@ -22,3 +24,12 @@ class Transactions:
     async def delete(cls, db, instance):
         await db.delete(instance)
         await cls.save(db)
+
+    @staticmethod
+    async def get_by_id(cls, db, id):
+        return await db.get(cls, id)
+    
+    @staticmethod
+    async def get_by_email(cls, db, email):
+        result = await db.execute(select(cls).where(cls.email == email))
+        return result.scalar_one_or_none()

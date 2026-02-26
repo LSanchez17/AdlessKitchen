@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Column, DateTime, String
+from sqlalchemy import Column, DateTime, String, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.db import Base
 from pwdlib import PasswordHash
@@ -46,3 +46,11 @@ class User(Transactions, Base):
         await cls.save(cls, db)
         await cls.refresh(cls, db, user)
         return user
+    
+    @classmethod
+    async def login(cls, email: str, password: str, db: AsyncSession):
+        user = await cls.get_by_email(cls, db, email)
+
+        if user and cls.verify_password(password, user.password_hash):
+            return user
+        return None
