@@ -14,7 +14,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["X-Redirect-To"]
+    expose_headers=["X-Redirect-To", "X-Auth-Token"]
 )
 
 app.include_router(user_controller.router)

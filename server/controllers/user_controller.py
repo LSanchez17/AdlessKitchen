@@ -8,6 +8,9 @@ from uuid import uuid4
 from db.db import get_db
 from models.user import User
 from security.session import create_session, get_user_from_session
+from security.token_refresh import get_user_and_refresh, SECRET_KEY, ALGORITHM
+import jwt
+from datetime import datetime, timedelta, timezone
 from schemas.user_schema import (
     UserCreate,
     UserUpdate,
@@ -20,15 +23,21 @@ from redis.asyncio import Redis
 
 SECURE = "Secure" if os.getenv("PRODUCTION") else ""
 
-router = APIRouter(prefix="/users", tags=["users"])
+router = APIRouter(
+    prefix="/users",
+    tags=["users"],
+)
 
-# Type Aliases to reusability
+# Type Aliases
 DbDepends = Depends(get_db)
 UserDepends = Depends(get_user_from_session)
 
 @router.get("/", response_model=ServerResponse[UserRead])
-async def get_users(user: User = UserDepends, db: AsyncSession = DbDepends):
-    # `user` is the currently authenticated user; you can check roles/permissions
+async def get_users(
+    user: User = UserDepends,
+    db: AsyncSession = DbDepends,
+    _refresh: None = Depends(get_user_and_refresh),
+):
     result = await db.execute(select(User))
     users = result.scalars().all()
     return ServerResponse(entity="users", results=users)
@@ -38,6 +47,7 @@ async def get_user(
     user_id: str,
     current: User = UserDepends,
     db: AsyncSession = DbDepends,
+    _refresh: None = Depends(get_user_and_refresh),
 ):
     user = await db.get(User, user_id)
     if not user:
@@ -49,11 +59,16 @@ async def update_user(
     user_id: str,
     body: UserUpdate,
     current: User = UserDepends,
+    _refresh: None = Depends(get_user_and_refresh),
 ):
     return {"message": "This is a placeholder for the user controller."}
 
 @router.delete("/{user_id}")
-async def delete_user(user_id: str, current: User = UserDepends):
+async def delete_user(
+    user_id: str,
+    current: User = UserDepends,
+    _refresh: None = Depends(get_user_and_refresh),
+):
     return {"message": "This is a placeholder for the user controller."}
 
 @router.post("/login")
@@ -62,16 +77,21 @@ async def login(login: UserLogin, db: AsyncSession = DbDepends, redis: Redis = D
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    token = await create_session(user.id, redis)
+    # redis session tied to cookie
+    session = await create_session(user.id, redis)
+    # client side jwt for client side validations
+    jwt_payload = {"sub": user.id, "exp": datetime.now(timezone.utc) + timedelta(hours=1)}
+    jwt_token = jwt.encode(jwt_payload, SECRET_KEY, algorithm=ALGORITHM)
 
     # We need to validate the model since we are returning a SQLAlchemy model instance, and the response model expects a Pydantic model
     resp = ServerResponse(entity="users", results=[UserRead.model_validate(user)])
     same_site = "None"
     headers = {
         "Set-Cookie": (
-            f"session={token}; HttpOnly; Path=/; Max-Age=86400;"
+            f"session={session}; HttpOnly; Path=/; Max-Age=86400;"
             f"SameSite={same_site}; {SECURE}"
         ),
+        "X-Auth-Token": jwt_token,
         "X-Redirect-To": "/home",
     }
 
@@ -82,17 +102,21 @@ async def signup(new_user: UserCreate, db: AsyncSession = DbDepends, redis: Redi
     user = await User.create(new_user, db)
     if not user:
         raise HTTPException(status_code=500, detail="Failed to create user")
-
-    token = await create_session(user.id, redis)
+    # redis session tied to cookie
+    session = await create_session(user.id, redis)
+    # client side jwt for client side validations
+    jwt_payload = {"sub": user.id, "exp": datetime.now(timezone.utc) + timedelta(hours=1)}
+    jwt_token = jwt.encode(jwt_payload, SECRET_KEY, algorithm=ALGORITHM)
 
     # We need to validate the model since we are returning a SQLAlchemy model instance, and the response model expects a Pydantic model
     resp = ServerResponse(entity="users", results=[UserRead.model_validate(user)])
     same_site = "None"
     headers = {
         "Set-Cookie": (
-            f"session={token}; HttpOnly; Path=/; Max-Age=86400;"
+            f"session={session}; HttpOnly; Path=/; Max-Age=86400;"
             f"SameSite={same_site}; {SECURE}"
         ),
+        "X-Auth-Token": jwt_token,
         "X-Redirect-To": "/home",
     }
 

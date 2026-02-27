@@ -12,6 +12,7 @@ const initialState: User = {
     lastName: undefined,
     email: undefined,
     id: undefined,
+    token: localStorage.getItem('token') ?? undefined,
 };
 
 const userSlice = createSlice({
@@ -23,13 +24,11 @@ const userSlice = createSlice({
             state.lastName = undefined;
             state.email = undefined;
             state.id = undefined;
+            state.token = undefined;
+            localStorage.removeItem('token');
         },
-        setUser(state, action: PayloadAction<User | null>) {
-            const user = action.payload;
-            state.firstName = user?.firstName ?? undefined;
-            state.lastName = user?.lastName ?? undefined;
-            state.email = user?.email ?? undefined;
-            state.id = user?.id ?? undefined;
+        setToken(state, action: PayloadAction<string | null>) {
+            state.token = action.payload ?? undefined;
         },
     },
     extraReducers(builder) {
@@ -56,9 +55,9 @@ const userSlice = createSlice({
     },
 });
 
-export const { logout, setUser } = userSlice.actions;
+export const { logout, setToken } = userSlice.actions;
 
 export const selectCurrentUser = (state: RootState) => state.users;
-export const selectIsUserLoggedIn = (state: RootState) => !!state.users.id;
+export const selectIsUserLoggedIn = (state: RootState) => !!state.users.token;
 
 export default userSlice.reducer;
