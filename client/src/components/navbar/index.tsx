@@ -1,3 +1,4 @@
+import { useLogoutMutation } from "@/api/endpoints/user/user_api";
 import { logout, selectIsUserLoggedIn } from "@/modules/user/user_slice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { Link } from "react-router-dom";
@@ -5,8 +6,10 @@ import { Link } from "react-router-dom";
 const Navbar = () => {
     const dispatch = useAppDispatch();
     const isUserLoggedIn = useAppSelector(state => selectIsUserLoggedIn(state));
+    const [logoutMutation] = useLogoutMutation();
 
-    const handleSignOut = () => {
+    const handleSignOut = async () => {
+        await logoutMutation();
         dispatch(logout());
     };
 
