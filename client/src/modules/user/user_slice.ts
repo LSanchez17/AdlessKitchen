@@ -42,13 +42,23 @@ const userSlice = createSlice({
                 state.email = result.email ?? undefined;
                 state.id = result.id ?? undefined;
             }
-        );
+        ),
+            builder.addMatcher(
+                userApi.endpoints.signup.matchFulfilled,
+                (state, action: PayloadAction<Response<User>>) => {
+                    const result = action.payload.results[0];
+                    state.firstName = result.firstName ?? undefined;
+                    state.lastName = result.lastName ?? undefined;
+                    state.email = result.email ?? undefined;
+                    state.id = result.id ?? undefined;
+                }
+            )
     },
 });
 
 export const { logout, setUser } = userSlice.actions;
 
-export const selectCurrentUser = (state: RootState) => state.users.id;
-export const selectIsUserLoggedIn = (state: RootState) => !!state.users.token;
+export const selectCurrentUser = (state: RootState) => state.users;
+export const selectIsUserLoggedIn = (state: RootState) => !!state.users.id;
 
 export default userSlice.reducer;

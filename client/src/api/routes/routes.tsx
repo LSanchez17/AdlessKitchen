@@ -3,7 +3,7 @@ import App from "@/App"
 import Login from "@/modules/login"
 import Signup from "@/modules/signup"
 import { createBrowserRouter } from 'react-router-dom'
-import { Home } from 'lucide-react'
+import Home from '@/modules/home'
 
 const router = createBrowserRouter([
     {

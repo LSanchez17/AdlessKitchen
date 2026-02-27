@@ -10,7 +10,6 @@ const baseQuery: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> =
         const result = await rawBaseQuery(args, api, extraOptions);
 
         const redirect = result.meta?.response?.headers?.get('X-Redirect-To');
-        console.log('redirect??', result.meta?.response);
         if (redirect) {
             window.location.href = redirect;
         }

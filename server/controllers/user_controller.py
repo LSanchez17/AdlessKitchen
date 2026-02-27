@@ -1,3 +1,5 @@
+import os
+
 from fastapi import APIRouter, Depends, HTTPException, Response, Cookie
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -16,6 +18,7 @@ from schemas.response_schema import ServerResponse
 from cache.redis import get_redis
 from redis.asyncio import Redis
 
+SECURE = "Secure" if os.getenv("PRODUCTION") else ""
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -63,10 +66,11 @@ async def login(login: UserLogin, db: AsyncSession = DbDepends, redis: Redis = D
 
     # We need to validate the model since we are returning a SQLAlchemy model instance, and the response model expects a Pydantic model
     resp = ServerResponse(entity="users", results=[UserRead.model_validate(user)])
+    same_site = "None"
     headers = {
         "Set-Cookie": (
-            f"session={token}; HttpOnly; Path=/; "
-            "SameSite=lax; Secure"
+            f"session={token}; HttpOnly; Path=/; Max-Age=86400;"
+            f"SameSite={same_site}; {SECURE}"
         ),
         "X-Redirect-To": "/home",
     }
@@ -83,10 +87,11 @@ async def signup(new_user: UserCreate, db: AsyncSession = DbDepends, redis: Redi
 
     # We need to validate the model since we are returning a SQLAlchemy model instance, and the response model expects a Pydantic model
     resp = ServerResponse(entity="users", results=[UserRead.model_validate(user)])
+    same_site = "None"
     headers = {
         "Set-Cookie": (
-            f"session={token}; HttpOnly; Path=/; "
-            "SameSite=lax; Secure"
+            f"session={token}; HttpOnly; Path=/; Max-Age=86400;"
+            f"SameSite={same_site}; {SECURE}"
         ),
         "X-Redirect-To": "/home",
     }
@@ -101,10 +106,10 @@ async def logout(
     if session_token:
         await redis.delete(f"session:{session_token}")
 
+    # clear cookie; SameSite/secure flags not needed when deleting
     headers = {
         "Set-Cookie": "session=; HttpOnly; Path=/; Max-Age=0",
         "X-Redirect-To": "/login",
-
     }
     return Response(
         content='{"message": "Logged out successfully"}',

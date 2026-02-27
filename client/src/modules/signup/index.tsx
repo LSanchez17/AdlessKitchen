@@ -8,8 +8,15 @@ const Signup = () => {
     const [password, setPassword] = useState("")
     const [signUp, { isLoading, isError }] = useSignupMutation()
 
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
     const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault()
+        if (password.length < 8) {
+            setErrorMessage("Password must be at least 8 characters.")
+            return
+        }
+        setErrorMessage(null)
         signUp({ email, password })
     }
 
@@ -46,7 +53,10 @@ const Signup = () => {
                 <Button type="submit" variant="secondary" className="w-full" disabled={isLoading}>
                     {isLoading ? 'Signing up...' : 'Sign up'}
                 </Button>
-                {isError && (
+                {errorMessage && (
+                    <p className="mt-4 text-red-400 text-center">{errorMessage}</p>
+                )}
+                {isError && !errorMessage && (
                     <p className="mt-4 text-red-400 text-center">
                         Signup failed. Please check your information and try again.
                     </p>

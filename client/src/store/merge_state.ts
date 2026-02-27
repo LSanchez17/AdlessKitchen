@@ -42,8 +42,8 @@ const updateData = <T extends { id?: string | number }>(
     );
 };
 
-const removeData = <T extends { id?: string | number }>(existing: T[] | undefined, id?: string | number): T[] | null => {
-    if (!existing || !id) return existing || null;
+const removeData = <T extends { id?: string | number }>(existing: T[] | undefined, id?: string | number): T[] => {
+    if (!existing || !id) return existing ?? [];
     return existing.filter((item) => item?.id !== id);
 };
 
