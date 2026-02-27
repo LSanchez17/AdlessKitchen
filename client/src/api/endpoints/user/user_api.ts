@@ -19,9 +19,15 @@ const userApi = api.injectEndpoints({
                 body: userInfo,
             }),
         }),
+        logout: builder.mutation<void, void>({
+            query: () => ({
+                url: 'users/logout',
+                method: 'POST',
+            }),
+        }),
     }),
     overrideExisting: false,
 })
 
-export const { useLoginMutation, useSignupMutation } = userApi;
+export const { useLoginMutation, useSignupMutation, useLogoutMutation } = userApi;
 export { userApi };
