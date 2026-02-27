@@ -1,23 +1,39 @@
 from pydantic import BaseModel, EmailStr
+from schemas.response_schema import model_config
 
 # Base schema for all user-related operations
+# first/last are optional in case users haven't provided them yet
 class UserBase(BaseModel):
-    first_name: str
-    last_name: str
+    first_name: str | None = None
+    last_name: str | None = None
     email: EmailStr
 
-# For creating users, we dont need the other schema fields
+    model_config = model_config
+
+# For creating users
 class UserCreate(BaseModel):
-    password: str
     email: EmailStr
+    password: str
+    first_name: str | None = None
+    last_name: str | None = None
+
+    model_config = model_config
+
+# For logging in
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+    model_config = model_config
 
 # Include the id field for reading users
 class UserRead(UserBase):
     id: str
 
-    class Config:
-        # allows reading from ORM object; FastAPI should serialize this
-        from_attributes = True   
+    model_config = {
+        **model_config,
+        "from_attributes": True,
+    }
 
 # For updating users, all fields are optional
 class UserUpdate(BaseModel):
@@ -25,3 +41,5 @@ class UserUpdate(BaseModel):
     last_name: str | None = None
     email: EmailStr | None = None
     password: str | None = None
+
+    model_config = model_config

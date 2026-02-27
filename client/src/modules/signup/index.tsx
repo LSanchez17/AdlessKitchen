@@ -1,14 +1,23 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { useSignupMutation } from "@/api/endpoints/user/user_api"
 
 const Signup = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [signUp, { isLoading, isError }] = useSignupMutation()
+
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
     const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault()
-        console.log("signup", email, password)
+        if (password.length < 8) {
+            setErrorMessage("Password must be at least 8 characters.")
+            return
+        }
+        setErrorMessage(null)
+        signUp({ email, password })
     }
 
     return (
@@ -41,9 +50,17 @@ const Signup = () => {
                         className="w-full px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
                     />
                 </div>
-                <Button type="submit" variant="secondary" className="w-full">
-                    Sign up
+                <Button type="submit" variant="secondary" className="w-full" disabled={isLoading}>
+                    {isLoading ? 'Signing up...' : 'Sign up'}
                 </Button>
+                {errorMessage && (
+                    <p className="mt-4 text-red-400 text-center">{errorMessage}</p>
+                )}
+                {isError && !errorMessage && (
+                    <p className="mt-4 text-red-400 text-center">
+                        Signup failed. Please check your information and try again.
+                    </p>
+                )}
             </form>
         </div>
     )

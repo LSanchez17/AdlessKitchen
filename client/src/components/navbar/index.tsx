@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const Navbar = () => {
     const dispatch = useAppDispatch();
-    const isUserLoggedIn = useAppSelector(selectIsUserLoggedIn);
+    const isUserLoggedIn = useAppSelector(state => selectIsUserLoggedIn(state));
 
     const handleSignOut = () => {
         dispatch(logout());
