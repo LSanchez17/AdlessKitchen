@@ -9,8 +9,13 @@ const Navbar = () => {
     const [logoutMutation] = useLogoutMutation();
 
     const handleSignOut = async () => {
-        await logoutMutation();
-        dispatch(logout());
+        try {
+            await logoutMutation().unwrap();
+        } catch (err) {
+            console.error('logout failed', err);
+        } finally {
+            dispatch(logout());
+        }
     };
 
     return (
