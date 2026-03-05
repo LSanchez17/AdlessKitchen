@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from controllers import user_controller
+from controllers import user_controller, recipes_controller
 
 app = FastAPI(title="AdlessKitchen - Server (dev)")
 
@@ -18,6 +18,7 @@ app.add_middleware(
 )
 
 app.include_router(user_controller.router)
+app.include_router(recipes_controller.router)
 
 @app.get("/health")
 async def health():

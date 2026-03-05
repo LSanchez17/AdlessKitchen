@@ -4,6 +4,7 @@ import Login from "@/modules/login"
 import Signup from "@/modules/signup"
 import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom'
 import Home from '@/modules/home'
+import RecipesPage from '@/modules/recipes'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
     const location = useLocation();
@@ -24,6 +25,7 @@ const router = createBrowserRouter([
             { path: 'login', element: <Login /> },
             { path: 'signup', element: <Signup /> },
             { path: 'home', element: <RequireAuth><Home /></RequireAuth> },
+            { path: 'recipes', element: <RequireAuth><RecipesPage /></RequireAuth> },
         ],
     },
 ])
