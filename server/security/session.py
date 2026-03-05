@@ -45,3 +45,11 @@ async def get_user_from_session(
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
     return user
+
+async def get_current_user(user: User = Depends(get_user_from_session)) -> User:
+    """Dependency returning the authenticated user without side effects.
+
+    Designed for use in business‑logic controllers where only the current user
+    identity is needed.  It simply proxies to :func:`get_user_from_session`.
+    """
+    return user

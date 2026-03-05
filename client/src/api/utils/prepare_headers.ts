@@ -1,14 +1,17 @@
-const prepareHeaders = (extraOptions: {}) => {
+import type { FetchArgs } from "@reduxjs/toolkit/query/react";
+
+const prepareHeaders = (extraOptions?: FetchArgs) => {
     const token = localStorage.getItem('token');
 
     if (token) {
-        extraOptions = {
-            ...extraOptions,
+        const existingHeaders = extraOptions?.headers ?? {};
+        return {
+            ...(extraOptions || {}),
             headers: {
-                ...(extraOptions as any)?.headers,
+                ...existingHeaders,
                 Authorization: `Bearer ${token}`,
             },
-        };
+        } as FetchArgs;
     }
 
     return extraOptions;

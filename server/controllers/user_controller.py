@@ -7,7 +7,7 @@ from uuid import uuid4
 
 from db.db import get_db
 from models.user import User
-from security.session import create_session, get_user_from_session
+from security.session import create_session, get_current_user
 from security.token_refresh import get_user_and_refresh, SECRET_KEY, ALGORITHM
 import jwt
 from datetime import datetime, timedelta, timezone
@@ -30,7 +30,7 @@ router = APIRouter(
 
 # Type Aliases
 DbDepends = Depends(get_db)
-UserDepends = Depends(get_user_from_session)
+UserDepends = Depends(get_current_user)
 
 @router.get("/", response_model=ServerResponse[UserRead])
 async def get_users(
