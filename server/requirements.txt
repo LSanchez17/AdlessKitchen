@@ -7,3 +7,4 @@ alembic
 pydantic[email]
 pwdlib[argon2]
 redis[async]
+httpx

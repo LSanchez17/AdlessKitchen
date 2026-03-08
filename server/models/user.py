@@ -1,6 +1,7 @@
 import uuid
 
 from sqlalchemy import Column, DateTime, String, select
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.db import Base
 from pwdlib import PasswordHash
@@ -21,6 +22,12 @@ class User(Transactions, TimestampMixin, Base):
     last_login = Column(DateTime(timezone=True), nullable=True)
     reset_password_token = Column(String, nullable=True)
     reset_password_expires = Column(DateTime(timezone=True), nullable=True)
+
+    recipes = relationship(
+        "Recipe",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
     
     @classmethod
     def all_users(cls, db):
