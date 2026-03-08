@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from controllers import user_controller
+from controllers import recipes_controller, users_controller
 
 app = FastAPI(title="AdlessKitchen - Server (dev)")
 
@@ -17,7 +17,8 @@ app.add_middleware(
     expose_headers=["X-Redirect-To", "X-Auth-Token"]
 )
 
-app.include_router(user_controller.router)
+app.include_router(users_controller.router)
+app.include_router(recipes_controller.router)
 
 @app.get("/health")
 async def health():

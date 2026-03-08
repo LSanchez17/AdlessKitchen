@@ -11,7 +11,7 @@ if sys.platform.startswith("win"):
 from db.db import Base, engine
 
 # Models for migrations
-from models import user
+from models import user, recipe, ingredient, recipe_ingredient
 # End of models for migrations
 
 

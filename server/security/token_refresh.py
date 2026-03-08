@@ -16,7 +16,7 @@ ALGORITHM = os.getenv("ALGORITHM", "HS256")
 
 async def get_user_and_refresh(
     response: Response,
-    session_token: str | None = Cookie(None),
+    session_token: str | None = Cookie(None, alias="session"),
     authorization: str | None = Header(None),
     redis: Redis = Depends(get_redis),
     db: AsyncSession = Depends(get_db),
@@ -39,6 +39,10 @@ async def get_user_and_refresh(
         raise HTTPException(status_code=401, detail="Not authenticated")
 
     user_id = await redis.get(f"session:{session_token}")
+    
+    # redis may return bytes; decode to string so SQLAlchemy primary key lookup works
+    if isinstance(user_id, (bytes, bytearray)):
+        user_id = user_id.decode()
 
     if not user_id:
         raise HTTPException(status_code=401, detail="Session expired")

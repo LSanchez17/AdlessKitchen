@@ -24,7 +24,7 @@ async def create_session(user_id: str, redis: Redis) -> str:
 
 
 async def get_user_from_session(
-    session_token: str | None = Cookie(None),
+    session_token: str | None = Cookie(None, alias="session"),
     redis: Redis = Depends(get_redis),
     db: AsyncSession = Depends(get_db),
 ) -> User:
@@ -36,6 +36,10 @@ async def get_user_from_session(
         raise HTTPException(status_code=401, detail="Not authenticated")
     
     user_id = await redis.get(f"session:{session_token}")
+
+    # redis may return bytes; decode to string so SQLAlchemy primary key lookup works
+    if isinstance(user_id, (bytes, bytearray)):
+        user_id = user_id.decode()
 
     if not user_id:
         raise HTTPException(status_code=401, detail="Session expired")
